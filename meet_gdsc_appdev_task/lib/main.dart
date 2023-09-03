@@ -1,13 +1,18 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:meet_gdsc_appdev_task/screens/home.dart';
 import 'package:meet_gdsc_appdev_task/screens/signup.dart';
 
 import 'constants/colors.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -46,15 +51,13 @@ class _SplashScreen extends State<SplashScreen> {
 
   void checkLogin() async {
     _timer = Timer(const Duration(seconds: 2), () async {
-      // if (FirebaseAuth.instance.currentUser != null) {
-      //     Get.offAll(() => const Phone(),
-      //       transition: Transition.rightToLeftWithFade);
-      // } else {
-      //   Get.offAll(() => const Phone(),
-      //       transition: Transition.rightToLeftWithFade);
-      // }
-      Get.offAll(() => const SignUp(),
-          transition: Transition.rightToLeftWithFade);
+      if (FirebaseAuth.instance.currentUser != null) {
+        Get.offAll(() => const Home(),
+            transition: Transition.rightToLeftWithFade);
+      } else {
+        Get.offAll(() => const SignUp(),
+            transition: Transition.rightToLeftWithFade);
+      }
     });
   }
 

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "684093186306",
+    "project_id": "meet-gdsc",
+    "storage_bucket": "meet-gdsc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:684093186306:android:62b967f43a4a9b12efa21b",
+        "android_client_info": {
+          "package_name": "com.meet.gdsc_appdev_task"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "684093186306-ke0i7mceabmbtjres30idm5o9bsv41pi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWXuCTwkJVNMzHy3iRXdAE45bUvbskIPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "684093186306-ke0i7mceabmbtjres30idm5o9bsv41pi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

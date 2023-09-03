@@ -1,8 +1,11 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/src/get_utils/get_utils.dart';
 import 'package:meet_gdsc_appdev_task/constants/colors.dart';
+import 'package:meet_gdsc_appdev_task/screens/home.dart';
 import 'package:meet_gdsc_appdev_task/screens/login.dart';
 
 class SignUp extends StatefulWidget {
@@ -13,6 +16,50 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  //Method to Signup User to Firebase
+  Future signUp() async {
+    final isValid = formKey.currentState!.validate();
+    if (!isValid) return;
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+
+    try {
+      //signup into Firebase with entered email and password
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email.text.trim(), password: password.text.trim());
+
+      //set Firebase Display Name as User Name
+      await FirebaseAuth.instance.currentUser
+          ?.updateDisplayName(username.text.trim());
+
+      //setting a default profile pic which can be changed later
+      await FirebaseAuth.instance.currentUser?.updatePhotoURL(
+          "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png");
+
+      //If Sign Up is success go to HomePage else show Error Dialog
+      Get.back(closeOverlays: true);
+      Get.offAll(() => const Home(),
+          transition: Transition.rightToLeftWithFade);
+    } on FirebaseAuthException catch (e) {
+      Get.back(closeOverlays: true);
+      AwesomeDialog(
+        descTextStyle:
+            const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.scale,
+        title: 'Error Occured',
+        desc: e.toString().split("]")[1],
+        dialogBorderRadius: const BorderRadius.all(Radius.circular(10)),
+        btnOkColor: AppColors.primaryColor,
+        btnOkOnPress: () {},
+      ).show();
+    }
+  }
+
+  final formKey = GlobalKey<FormState>();
   final username = TextEditingController();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -62,171 +109,178 @@ class _SignUpState extends State<SignUp> {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.fromLTRB(22, 50, 22, 50),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Hello User!",
-              style: TextStyle(
-                  fontSize: 28,
-                  color: AppColors.secondaryColor,
-                  fontWeight: FontWeight.w600),
-              textAlign: TextAlign.left,
-            ),
-            const Text(
-              "Register to get started",
-              style: TextStyle(
-                  fontSize: 28,
-                  color: AppColors.secondaryColor,
-                  fontWeight: FontWeight.w600),
-              textAlign: TextAlign.left,
-            ),
-            const SizedBox(
-              height: 32,
-            ),
-            Container(
-              // height: 60,
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-              decoration: const BoxDecoration(
-                  color: AppColors.backgroundColor,
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
-              child: Center(
-                child: TextFormField(
-                  textInputAction: TextInputAction.next,
-                  controller: username,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (input) {
-                    if (input!.isNotEmpty) {
-                      return null;
-                    } else {
-                      return "Enter a valid name";
-                    }
-                  },
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w500),
-                  textAlign: TextAlign.left,
-                  decoration: const InputDecoration(
-                      hintText: "Enter Your Name",
-                      border: InputBorder.none,
-                      prefixIconColor: AppColors.secondaryColor,
-                      prefixIcon: Icon(Icons.person)),
-                  onChanged: ((value) {}),
-                ),
+        child: Form(
+          key: formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Hello User!",
+                style: TextStyle(
+                    fontSize: 28,
+                    color: AppColors.secondaryColor,
+                    fontWeight: FontWeight.w600),
+                textAlign: TextAlign.left,
               ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              decoration: const BoxDecoration(
-                  color: AppColors.backgroundColor,
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
-              child: Center(
-                child: TextFormField(
-                  textInputAction: TextInputAction.next,
-                  controller: email,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (input) {
-                    if (GetUtils.isEmail(input!)) {
-                      return null;
-                    } else {
-                      return "Enter a valid email";
-                    }
-                  },
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w500),
-                  textAlign: TextAlign.left,
-                  decoration: const InputDecoration(
-                      hintText: "Enter Your Email ID.",
-                      border: InputBorder.none,
-                      prefixIconColor: AppColors.secondaryColor,
-                      prefixIcon: Icon(Icons.email)),
-                  onChanged: ((value) {}),
-                ),
+              const Text(
+                "Register to get started",
+                style: TextStyle(
+                    fontSize: 28,
+                    color: AppColors.secondaryColor,
+                    fontWeight: FontWeight.w600),
+                textAlign: TextAlign.left,
               ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              decoration: const BoxDecoration(
-                  color: AppColors.backgroundColor,
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      textInputAction: TextInputAction.next,
-                      controller: password,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (input) {
-                        if (input!.isNotEmpty && input.length >= 8) {
-                          return null;
-                        } else {
-                          return "Create a valid password of minimum 8 characters";
-                        }
-                      },
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w500),
-                      textAlign: TextAlign.left,
-                      decoration: const InputDecoration(
-                          hintText: "Enter Your Password",
-                          border: InputBorder.none,
-                          prefixIconColor: AppColors.secondaryColor,
-                          prefixIcon: Icon(Icons.lock)),
-                      obscureText: showpassword,
-                      onChanged: ((value) {}),
-                    ),
+              const SizedBox(
+                height: 32,
+              ),
+              Container(
+                // height: 60,
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                decoration: const BoxDecoration(
+                    color: AppColors.backgroundColor,
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                child: Center(
+                  child: TextFormField(
+                    textInputAction: TextInputAction.next,
+                    controller: username,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (input) {
+                      if (input!.isNotEmpty) {
+                        return null;
+                      } else {
+                        return "Enter a valid name";
+                      }
+                    },
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w500),
+                    textAlign: TextAlign.left,
+                    decoration: const InputDecoration(
+                        hintText: "Enter Your Name",
+                        border: InputBorder.none,
+                        prefixIconColor: AppColors.secondaryColor,
+                        prefixIcon: Icon(Icons.person)),
+                    onChanged: ((value) {}),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          showpassword = !showpassword;
-                        });
-                      },
-                      child: Icon(
-                        showpassword ? Icons.visibility : Icons.visibility_off,
-                        color: AppColors.secondaryColor,
+                ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                decoration: const BoxDecoration(
+                    color: AppColors.backgroundColor,
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                child: Center(
+                  child: TextFormField(
+                    textInputAction: TextInputAction.next,
+                    controller: email,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (input) {
+                      if (GetUtils.isEmail(input!)) {
+                        return null;
+                      } else {
+                        return "Enter a valid email";
+                      }
+                    },
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w500),
+                    textAlign: TextAlign.left,
+                    decoration: const InputDecoration(
+                        hintText: "Enter Your Email ID.",
+                        border: InputBorder.none,
+                        prefixIconColor: AppColors.secondaryColor,
+                        prefixIcon: Icon(Icons.email)),
+                    onChanged: ((value) {}),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                decoration: const BoxDecoration(
+                    color: AppColors.backgroundColor,
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        textInputAction: TextInputAction.next,
+                        controller: password,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (input) {
+                          if (input!.isNotEmpty && input.length >= 8) {
+                            return null;
+                          } else {
+                            return "Create a valid password of minimum 8 characters";
+                          }
+                        },
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w500),
+                        textAlign: TextAlign.left,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Your Password",
+                            border: InputBorder.none,
+                            prefixIconColor: AppColors.secondaryColor,
+                            prefixIcon: Icon(Icons.lock)),
+                        obscureText: showpassword,
+                        onChanged: ((value) {}),
                       ),
                     ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            showpassword = !showpassword;
+                          });
+                        },
+                        child: Icon(
+                          showpassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: AppColors.secondaryColor,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            InkWell(
-              onTap: () {},
-              child: Container(
-                height: 60,
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(18, 5, 18, 5),
-                decoration: const BoxDecoration(
-                    color: AppColors.primaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(8))),
-                child: const Center(
-                    child: Text(
-                  "Register",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900),
-                )),
+              const SizedBox(
+                height: 30,
               ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-          ],
+              InkWell(
+                onTap: () {
+                  signUp();
+                },
+                child: Container(
+                  height: 60,
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(18, 5, 18, 5),
+                  decoration: const BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  child: const Center(
+                      child: Text(
+                    "Register",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900),
+                  )),
+                ),
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
