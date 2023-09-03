@@ -1,7 +1,6 @@
-
-title: Meet Chavan - GDSC DJSCE - App Task
-created at: Sun Sep 03 2023 16:50:20 GMT+0000 (Coordinated Universal Time)
-updated at: Sun Sep 03 2023 16:50:39 GMT+0000 (Coordinated Universal Time)
+---
+Created at: Sun Sep 03 2023 16:50:20 GMT+0000 (Coordinated Universal Time)
+Updated at: Sun Sep 03 2023 16:50:39 GMT+0000 (Coordinated Universal Time)
 ---
 
 # Meet Chavan - GDSC DJSCE - App Task
