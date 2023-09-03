@@ -51,6 +51,39 @@ class _LoginState extends State<Login> {
     }
   }
 
+  Future forgotPassword() async {
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: email.text.trim());
+      AwesomeDialog(
+        descTextStyle:
+            const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.scale,
+        title: 'Password Reset Link Sent!',
+        desc:
+            "A password reset instructions has been sent to your email please check your spam/inbox for further instructions.",
+        dialogBorderRadius: const BorderRadius.all(Radius.circular(10)),
+        btnOkColor: AppColors.primaryColor,
+        btnOkOnPress: () {},
+      ).show();
+    } on FirebaseAuthException catch (e) {
+      AwesomeDialog(
+        descTextStyle:
+            const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.scale,
+        title: 'Error Occured',
+        desc: e.toString().split("]")[1],
+        dialogBorderRadius: const BorderRadius.all(Radius.circular(10)),
+        btnOkColor: AppColors.primaryColor,
+        btnOkOnPress: () {},
+      ).show();
+    }
+  }
+
   final formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -215,7 +248,9 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      forgotPassword();
+                    },
                     child: const Text(
                       "Forgot Password?",
                       style: TextStyle(
